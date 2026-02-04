@@ -65,7 +65,7 @@ docker compose up -d \
 
 Optional (only if you need connection pooling):
 ```bash
-docker compose up -d supavisor
+docker compose up -d pgbouncer
 ```
 
 ### Add “Nice-to-Have” Services On Demand
@@ -127,7 +127,7 @@ Most service ports are bound to `127.0.0.1` (loopback) unless noted otherwise.
 | Auth | `supabase-auth` | `13799` | internal via Kong |
 | REST | `supabase-rest` | `13730` | internal via Kong |
 | Realtime | `supabase-realtime` | `13740` | internal via Kong |
-| DB Pooler | `supabase-pooler` | `13743` | Supavisor |
+| DB Pooler | `supabase-pgbouncer` | `13743` | PgBouncer |
 | Storage | `supabase-storage` | `13750` | internal via Kong |
 | Imgproxy | `supabase-imgproxy` | `13751` | used by Storage |
 | Meta | `supabase-meta` | `13760` | internal via Kong |
