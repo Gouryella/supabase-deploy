@@ -82,7 +82,7 @@ services:
       RUN_JANITOR: "false"
 
   pgbouncer:
-    image: edoburu/pgbouncer:1.23.1
+    image: edoburu/pgbouncer:latest
     container_name: supabase-pgbouncer
     restart: always
     depends_on:
