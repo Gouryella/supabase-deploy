@@ -186,6 +186,7 @@ docker compose down
 - **Deploy script times out waiting for roles:** check `docker compose logs --tail=200 db` and consider increasing `ROLE_WAIT_SECONDS`.
 - **Caddy cannot issue certificates:** verify DNS and open ports 80/443; confirm the domain in `Caddyfile`.
 - **Studio loads but API calls fail:** confirm `SUPABASE_PUBLIC_DOMAIN` is correct and restart the stack.
+- **`Database error creating new user` in Studio/Auth:** keep `auth` on direct `db:5432` instead of transaction-pooled PgBouncer, otherwise GoTrue may hit prepared-statement errors like `pgx_0 does not exist`.
 
 ## Security Notes
 - Treat `.env` as sensitive and never commit it.

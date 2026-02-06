@@ -21,15 +21,15 @@ services:
     restart: always
     depends_on:
       - db
-      - pgbouncer
     ports:
       - "127.0.0.1:13799:9999"
     environment:
       GOTRUE_API_PORT: 9999
       GOTRUE_DB_DRIVER: postgres
-      GOTRUE_DB_DATABASE_URL: postgres://supabase_auth_admin:${POSTGRES_PASSWORD}@pgbouncer:6432/${POSTGRES_DB}
+      GOTRUE_DB_DATABASE_URL: postgres://supabase_auth_admin:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}
       GOTRUE_SITE_URL: https://${SUPABASE_PUBLIC_DOMAIN}
       API_EXTERNAL_URL: https://${SUPABASE_PUBLIC_DOMAIN}
+      GOTRUE_MAILER_EXTERNAL_HOSTS: kong,${SUPABASE_PUBLIC_DOMAIN}
       GOTRUE_JWT_SECRET: ${JWT_SECRET}
       GOTRUE_JWT_EXP: ${JWT_EXP:-3600}
       GOTRUE_JWT_AUD: authenticated
