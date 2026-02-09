@@ -147,13 +147,21 @@ EOF_HELLO
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 ENV_FILE="$DIR/.env"
-DOCKER_COMPOSE_FILE="$DIR/docker-compose.yml"
+COMPOSE_VARIANT="${SUPABASE_DEPLOY_VARIANT:-tiny}"
 
 # Parse command-line arguments
 SKIP_START=false
 FORCE_RECREATE=false
 while [[ $# -gt 0 ]]; do
   case $1 in
+    --tiny)
+      COMPOSE_VARIANT="tiny"
+      shift
+      ;;
+    --standard)
+      COMPOSE_VARIANT="standard"
+      shift
+      ;;
     --config-only)
       SKIP_START=true
       shift
@@ -165,9 +173,13 @@ while [[ $# -gt 0 ]]; do
     -h|--help)
       echo "Usage: $0 [options]"
       echo "Options:"
+      echo "  --tiny         Use tiny deployment profile (Studio Go, default)"
+      echo "  --standard     Use standard deployment profile (official Studio)"
       echo "  --config-only  Generate config only, do not start services"
       echo "  --recreate     Force recreate all containers"
       echo "  -h, --help     Show help"
+      echo "Environment:"
+      echo "  SUPABASE_DEPLOY_VARIANT=tiny|standard"
       exit 0
       ;;
     *)
@@ -176,6 +188,21 @@ while [[ $# -gt 0 ]]; do
       ;;
   esac
 done
+
+case "$COMPOSE_VARIANT" in
+  tiny)
+    DOCKER_COMPOSE_FILE="$DIR/docker-compose.tiny.yml"
+    STUDIO_PROFILE="studio-go"
+    ;;
+  standard)
+    DOCKER_COMPOSE_FILE="$DIR/docker-compose.yml"
+    STUDIO_PROFILE="official-studio"
+    ;;
+  *)
+    log_error "Invalid SUPABASE_DEPLOY_VARIANT: $COMPOSE_VARIANT (expected tiny or standard)"
+    exit 1
+    ;;
+esac
 
 ensure_docker_ready
 
@@ -338,9 +365,13 @@ fi
 
 # Ensure docker-compose file exists
 if [ ! -f "$DOCKER_COMPOSE_FILE" ]; then
-    log_error "docker-compose.yml not found; place it in the script directory."
+    log_error "Compose file not found: $DOCKER_COMPOSE_FILE"
     exit 1
 fi
+
+log_info "Deployment profile: $COMPOSE_VARIANT"
+log_info "Compose file: $DOCKER_COMPOSE_FILE"
+log_info "Studio profile: $STUDIO_PROFILE"
 
 # docker compose wrapper (always use the same env-file)
 compose() {

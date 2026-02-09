@@ -64,6 +64,19 @@ download_file() {
   curl -fsSL "$url" -o "$dest"
 }
 
+download_file_optional() {
+  local rel_path="$1"
+  local dest="$INSTALL_DIR/$rel_path"
+  local url="$REPO_RAW_BASE/$rel_path"
+  mkdir -p "$(dirname "$dest")"
+  log_info "Downloading (optional) $rel_path"
+  if ! curl -fsSL "$url" -o "$dest"; then
+    log_warn "Optional file unavailable: $rel_path"
+    return 1
+  fi
+  return 0
+}
+
 DEFAULT_INSTALL_DIR="$HOME/supabase-deploy"
 if [ "$(id -u)" -eq 0 ]; then
   DEFAULT_INSTALL_DIR="/root/supabase-deploy"
@@ -71,6 +84,17 @@ fi
 
 INSTALL_DIR="${INSTALL_DIR:-$DEFAULT_INSTALL_DIR}"
 REPO_RAW_BASE="${REPO_RAW_BASE:-https://raw.githubusercontent.com/Gouryella/supabase-deploy/main}"
+
+USER_SELECTED_PROFILE=false
+for arg in "$@"; do
+  case "$arg" in
+    --tiny|--standard)
+      USER_SELECTED_PROFILE=true
+      ;;
+  esac
+done
+
+FALLBACK_DEPLOY_ARGS=()
 
 require_cmd bash
 require_cmd curl
@@ -84,6 +108,12 @@ mkdir -p "$INSTALL_DIR/config"
 
 download_file "deploy.sh"
 download_file "docker-compose.yml"
+if ! download_file_optional "docker-compose.tiny.yml"; then
+  if [ "$USER_SELECTED_PROFILE" = false ]; then
+    log_warn "Tiny compose is missing; falling back to standard profile."
+    FALLBACK_DEPLOY_ARGS=("--standard")
+  fi
+fi
 download_file "config/kong.yml.template"
 download_file "Caddyfile"
 
@@ -93,4 +123,4 @@ log_info "Bootstrap files are ready."
 log_info "Starting deployment..."
 
 cd "$INSTALL_DIR"
-exec bash "$INSTALL_DIR/deploy.sh" "$@"
+exec bash "$INSTALL_DIR/deploy.sh" "${FALLBACK_DEPLOY_ARGS[@]}" "$@"

@@ -24,11 +24,11 @@ If you want “clone → run one command → get a working Supabase”, this rep
 - **Low-memory friendly:** no bundled analytics/logging stack, and you can start only the services you need (keep Studio/Functions optional).
 
 ## Quick Start
-1. One-command deploy (auto-install Docker, auto-download compose/kong template, then deploy):
+1. One-command deploy (auto-install Docker, auto-download compose/kong template, then deploy). By default it uses the **tiny** profile:
    ```bash
    curl -fsSL https://raw.githubusercontent.com/Gouryella/supabase-deploy/main/install.sh | bash
    ```
-2. Set your domain in `/root/supabase-deploy/Caddyfile` (or `$HOME/supabase-deploy/Caddyfile` if not root), then rerun:
+2. Set your domain in `/root/supabase-deploy/Caddyfile` (or `$HOME/supabase-deploy/Caddyfile` if not root), then rerun (still tiny by default):
    ```bash
    bash /root/supabase-deploy/deploy.sh
    ```
@@ -37,11 +37,15 @@ If you want “clone → run one command → get a working Supabase”, this rep
 
 ### Optional Flags
 ```bash
+# Use standard profile instead of tiny
+curl -fsSL https://raw.githubusercontent.com/Gouryella/supabase-deploy/main/install.sh | bash -s -- --standard
+
 # Force container recreation
 curl -fsSL https://raw.githubusercontent.com/Gouryella/supabase-deploy/main/install.sh | bash -s -- --recreate
 
 # Custom install path
 curl -fsSL https://raw.githubusercontent.com/Gouryella/supabase-deploy/main/install.sh | INSTALL_DIR=/opt/supabase bash
+
 ```
 
 ## Prerequisites
@@ -146,8 +150,19 @@ Most service ports are bound to `127.0.0.1` (loopback) unless noted otherwise.
 
 ## Script Options
 ```bash
+./deploy.sh --tiny          # tiny profile (default)
+./deploy.sh --standard      # standard profile
 ./deploy.sh --config-only   # generate .env + kong.yml, do not start services
 ./deploy.sh --recreate      # force recreate all containers
+```
+
+Profiles map to compose files:
+- `tiny` → `docker-compose.tiny.yml` (Studio uses the Go version image)
+- `standard` → `docker-compose.yml` (Studio uses the official Supabase Studio image)
+
+You can also control profile via environment variables:
+```bash
+SUPABASE_DEPLOY_VARIANT=tiny|standard ./deploy.sh
 ```
 
 ## Configuration
