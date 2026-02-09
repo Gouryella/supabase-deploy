@@ -77,6 +77,60 @@ download_file_optional() {
   return 0
 }
 
+select_profile_if_needed() {
+  if [ "$USER_SELECTED_PROFILE" = true ]; then
+    return 0
+  fi
+
+  if ! { exec 3<> /dev/tty; } 2>/dev/null; then
+    log_info "No interactive terminal detected; defaulting to tiny profile."
+    return 0
+  fi
+
+  local choice
+  while true; do
+    {
+      echo
+      echo "Choose deployment profile:"
+      echo "  1) tiny (Studio Go, lower memory)"
+      echo "  2) standard (Official Studio image)"
+      printf "Enter choice [1/2] (default: 1): "
+    } >&3
+
+    if ! read -r choice <&3; then
+      log_warn "Unable to read your choice; defaulting to tiny profile."
+      exec 3<&-
+      exec 3>&-
+      return 0
+    fi
+
+    choice="${choice:-1}"
+    case "$choice" in
+      1)
+        USER_SELECTED_PROFILE=true
+        SELECTED_PROFILE="tiny"
+        PROMPT_DEPLOY_ARGS=("--tiny")
+        log_info "Profile selected: tiny"
+        exec 3<&-
+        exec 3>&-
+        return 0
+        ;;
+      2)
+        USER_SELECTED_PROFILE=true
+        SELECTED_PROFILE="standard"
+        PROMPT_DEPLOY_ARGS=("--standard")
+        log_info "Profile selected: standard"
+        exec 3<&-
+        exec 3>&-
+        return 0
+        ;;
+      *)
+        echo "Invalid choice. Please enter 1 or 2." >&3
+        ;;
+    esac
+  done
+}
+
 DEFAULT_INSTALL_DIR="$HOME/supabase-tiny"
 if [ "$(id -u)" -eq 0 ]; then
   DEFAULT_INSTALL_DIR="/root/supabase-tiny"
@@ -86,10 +140,17 @@ INSTALL_DIR="${INSTALL_DIR:-$DEFAULT_INSTALL_DIR}"
 REPO_RAW_BASE="${REPO_RAW_BASE:-https://raw.githubusercontent.com/Gouryella/supabase-tiny/main}"
 
 USER_SELECTED_PROFILE=false
+SELECTED_PROFILE=""
+PROMPT_DEPLOY_ARGS=()
 for arg in "$@"; do
   case "$arg" in
-    --tiny|--standard)
+    --tiny)
       USER_SELECTED_PROFILE=true
+      SELECTED_PROFILE="tiny"
+      ;;
+    --standard)
+      USER_SELECTED_PROFILE=true
+      SELECTED_PROFILE="standard"
       ;;
   esac
 done
@@ -102,6 +163,8 @@ require_cmd curl
 log_info "Install directory: $INSTALL_DIR"
 log_info "Asset source: $REPO_RAW_BASE"
 
+select_profile_if_needed
+
 ensure_docker
 
 mkdir -p "$INSTALL_DIR/config"
@@ -109,6 +172,10 @@ mkdir -p "$INSTALL_DIR/config"
 download_file "deploy.sh"
 download_file "docker-compose.yml"
 if ! download_file_optional "docker-compose.tiny.yml"; then
+  if [ "$SELECTED_PROFILE" = "tiny" ]; then
+    log_error "Tiny profile was selected, but docker-compose.tiny.yml is unavailable from $REPO_RAW_BASE."
+    exit 1
+  fi
   if [ "$USER_SELECTED_PROFILE" = false ]; then
     log_warn "Tiny compose is missing; falling back to standard profile."
     FALLBACK_DEPLOY_ARGS=("--standard")
@@ -123,4 +190,4 @@ log_info "Bootstrap files are ready."
 log_info "Starting deployment..."
 
 cd "$INSTALL_DIR"
-exec bash "$INSTALL_DIR/deploy.sh" "${FALLBACK_DEPLOY_ARGS[@]}" "$@"
+exec bash "$INSTALL_DIR/deploy.sh" "${FALLBACK_DEPLOY_ARGS[@]}" "${PROMPT_DEPLOY_ARGS[@]}" "$@"

@@ -24,11 +24,15 @@ If you want “clone → run one command → get a working Supabase”, this rep
 - **Low-memory friendly:** no bundled analytics/logging stack, and you can start only the services you need (keep Studio/Functions optional).
 
 ## Quick Start
-1. One-command deploy (auto-install Docker, auto-download compose/kong template, then deploy). By default it uses the **tiny** profile:
+1. One-command deploy (auto-install Docker, auto-download compose/kong template, then deploy). Installer will prompt profile selection:
    ```bash
    curl -fsSL https://raw.githubusercontent.com/Gouryella/supabase-tiny/main/install.sh | bash
+
+   # Choose at prompt:
+   # 1) tiny (Studio Go, lower memory)
+   # 2) standard (Official Studio image)
    ```
-2. Set your domain in `/root/supabase-tiny/Caddyfile` (or `$HOME/supabase-tiny/Caddyfile` if not root), then rerun (still tiny by default):
+2. Set your domain in `/root/supabase-tiny/Caddyfile` (or `$HOME/supabase-tiny/Caddyfile` if not root), then rerun:
    ```bash
    bash /root/supabase-tiny/deploy.sh
    ```
@@ -37,7 +41,10 @@ If you want “clone → run one command → get a working Supabase”, this rep
 
 ### Optional Flags
 ```bash
-# Use standard profile instead of tiny
+# Skip prompt and force tiny profile
+curl -fsSL https://raw.githubusercontent.com/Gouryella/supabase-tiny/main/install.sh | bash -s -- --tiny
+
+# Skip prompt and use official profile
 curl -fsSL https://raw.githubusercontent.com/Gouryella/supabase-tiny/main/install.sh | bash -s -- --standard
 
 # Force container recreation
