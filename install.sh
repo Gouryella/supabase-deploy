@@ -69,7 +69,7 @@ download_file_optional() {
   local dest="$INSTALL_DIR/$rel_path"
   local url="$REPO_RAW_BASE/$rel_path"
   mkdir -p "$(dirname "$dest")"
-  log_info "Downloading (optional) $rel_path"
+  log_info "Downloading $rel_path"
   if ! curl -fsSL "$url" -o "$dest"; then
     log_warn "Optional file unavailable: $rel_path"
     return 1
