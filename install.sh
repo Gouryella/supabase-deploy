@@ -77,13 +77,13 @@ download_file_optional() {
   return 0
 }
 
-DEFAULT_INSTALL_DIR="$HOME/supabase-deploy"
+DEFAULT_INSTALL_DIR="$HOME/supabase-tiny"
 if [ "$(id -u)" -eq 0 ]; then
-  DEFAULT_INSTALL_DIR="/root/supabase-deploy"
+  DEFAULT_INSTALL_DIR="/root/supabase-tiny"
 fi
 
 INSTALL_DIR="${INSTALL_DIR:-$DEFAULT_INSTALL_DIR}"
-REPO_RAW_BASE="${REPO_RAW_BASE:-https://raw.githubusercontent.com/Gouryella/supabase-deploy/main}"
+REPO_RAW_BASE="${REPO_RAW_BASE:-https://raw.githubusercontent.com/Gouryella/supabase-tiny/main}"
 
 USER_SELECTED_PROFILE=false
 for arg in "$@"; do

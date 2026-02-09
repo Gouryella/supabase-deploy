@@ -1,14 +1,14 @@
 # Supabase Deploy (Self-Hosted)
 
-[![GitHub Repo](https://img.shields.io/badge/GitHub-Gouryella%2Fsupabase--deploy-black)](https://github.com/Gouryella/supabase-deploy)
-[![GitHub stars](https://img.shields.io/github/stars/Gouryella/supabase-deploy?style=social)](https://github.com/Gouryella/supabase-deploy)
+[![GitHub Repo](https://img.shields.io/badge/GitHub-Gouryella%2Fsupabase--tiny-black)](https://github.com/Gouryella/supabase-tiny)
+[![GitHub stars](https://img.shields.io/github/stars/Gouryella/supabase-tiny?style=social)](https://github.com/Gouryella/supabase-tiny)
 [![Docker Compose](https://img.shields.io/badge/Docker-Compose-2496ED)](https://docs.docker.com/compose/)
 [![Shell](https://img.shields.io/badge/Shell-Bash-4EAA25)](https://www.gnu.org/software/bash/)
 
 Bring up a full Supabase stack with Docker Compose — but with the part you actually care about done right: **a single automated script** that generates keys, renders configs, orchestrates startup, and waits until the system is truly ready.
 
 ## Description
-`Gouryella/supabase-deploy` is a minimal, production-minded Supabase self-hosted setup built around `deploy.sh` — an idempotent deployment script that:
+`Gouryella/supabase-tiny` is a minimal, production-minded Supabase self-hosted setup built around `deploy.sh` — an idempotent deployment script that:
 - generates/updates `.env` secrets (including real JWTs for ANON / SERVICE ROLE keys)
 - renders Kong declarative config from a template
 - starts services in the correct order with readiness checks
@@ -26,11 +26,11 @@ If you want “clone → run one command → get a working Supabase”, this rep
 ## Quick Start
 1. One-command deploy (auto-install Docker, auto-download compose/kong template, then deploy). By default it uses the **tiny** profile:
    ```bash
-   curl -fsSL https://raw.githubusercontent.com/Gouryella/supabase-deploy/main/install.sh | bash
+   curl -fsSL https://raw.githubusercontent.com/Gouryella/supabase-tiny/main/install.sh | bash
    ```
-2. Set your domain in `/root/supabase-deploy/Caddyfile` (or `$HOME/supabase-deploy/Caddyfile` if not root), then rerun (still tiny by default):
+2. Set your domain in `/root/supabase-tiny/Caddyfile` (or `$HOME/supabase-tiny/Caddyfile` if not root), then rerun (still tiny by default):
    ```bash
-   bash /root/supabase-deploy/deploy.sh
+   bash /root/supabase-tiny/deploy.sh
    ```
 3. Open Studio:
    - `https://<your-domain>/`
@@ -38,13 +38,13 @@ If you want “clone → run one command → get a working Supabase”, this rep
 ### Optional Flags
 ```bash
 # Use standard profile instead of tiny
-curl -fsSL https://raw.githubusercontent.com/Gouryella/supabase-deploy/main/install.sh | bash -s -- --standard
+curl -fsSL https://raw.githubusercontent.com/Gouryella/supabase-tiny/main/install.sh | bash -s -- --standard
 
 # Force container recreation
-curl -fsSL https://raw.githubusercontent.com/Gouryella/supabase-deploy/main/install.sh | bash -s -- --recreate
+curl -fsSL https://raw.githubusercontent.com/Gouryella/supabase-tiny/main/install.sh | bash -s -- --recreate
 
 # Custom install path
-curl -fsSL https://raw.githubusercontent.com/Gouryella/supabase-deploy/main/install.sh | INSTALL_DIR=/opt/supabase bash
+curl -fsSL https://raw.githubusercontent.com/Gouryella/supabase-tiny/main/install.sh | INSTALL_DIR=/opt/supabase bash
 
 ```
 
